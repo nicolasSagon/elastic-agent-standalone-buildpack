@@ -21,6 +21,6 @@ else
 	sed -i "s|\[\[username\]\]|$log_stash_user_name|g" ./elastic-agent.yml
 	sed -i "s|\[\[password\]\]|$log_stash_password|g" ./elastic-agent.yml
 	echo "------> installing elastic-agent"
-	./elastic-agent install --non-interactive
+	sudo ./elastic-agent install --non-interactive
 	exit 0
 fi
