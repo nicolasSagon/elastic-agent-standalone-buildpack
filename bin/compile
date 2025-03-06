@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+ENV_DIR=${3:-}
+BP_DIR=$(cd $(dirname $0)/..; pwd) # absolute path
+log_stash_destination="$(cat $ENV_DIR/LOGGING_LOGSTASH_DESTINATION)"
+log_stash_user_name="$(cat $ENV_DIR/LOGSTASH_USERNAME)"
+log_stash_password="$(cat $ENV_DIR/LOGSTASH_PASSWORD)"
+
+if [ -z "$log_stash_destination" ] || [ -z "$log_stash_user_name" ] || [ -z "$log_stash_password" ]; then
+	echo "------> Set up your env variable : LOGGING_LOGSTASH_DESTINATION / LOGSTASH_USERNAME / LOGSTASH_PASSWORD"
+else 
+	echo "------> Setting up logstash"
+	currentDirectory=$(pwd)
+	real_home=$(getent passwd $(whoami) | cut -d ':' -f6)
+	mkdir -p "$real_home/elastic-agent"
+	cd "$real_home/elastic-agent"
+	curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.7.0-linux-x86_64.tar.gz
+	tar xzvf elastic-agent-8.7.0-linux-x86_64.tar.gz
+	cd elastic-agent-8.7.0-linux-x86_64
+	cp -f $BP_DIR/lib/elastic-agent.yml ./elastic-agent.yml
+	sed -i "s|\[\[url\]\]|$log_stash_destination|g" ./elastic-agent.yml
+	sed -i "s|\[\[username\]\]|$log_stash_user_name|g" ./elastic-agent.yml
+	sed -i "s|\[\[password\]\]|$log_stash_password|g" ./elastic-agent.yml
+	echo "------> installing elastic-agent"
+	./elastic-agent install --non-interactive
+	exit 0
+fi

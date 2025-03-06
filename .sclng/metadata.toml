@@ -1,0 +1,8 @@
+version = "1.0.0"
+owner = "nicolas.sagon@dossierfacile.fr"
+team = "MTES-MCT"
+description = "Add logstash standalone agent to scalingo project"
+languages = ["shell"]
+destination_server = []
+flags = ["buildpack"]
+dependencies = []
